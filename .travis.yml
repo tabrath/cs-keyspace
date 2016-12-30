@@ -1,0 +1,13 @@
+language: csharp
+solution: KeySpace.sln
+branches:
+  only:
+   - master
+install:
+  - nuget restore KeySpace.sln -PackagesDirectory ./packages
+script:
+  - xbuild /p:Configuration=Release KeySpace.sln
+  - mono ./packages/NUnit.ConsoleRunner.3.5.0/tools/nunit3-console.exe ./KeySpace.Tests/bin/Release/KeySpace.Tests.dll
+cache:
+  - directories:
+    - ./packages

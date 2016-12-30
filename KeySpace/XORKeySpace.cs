@@ -18,6 +18,21 @@ namespace KeySpace
 
         public Key Key(byte[] b) => new Key(this, _sha256.ComputeHash(b), b);
         public bool Equal(Key a, Key b) => a.Bytes.SequenceEqual(b.Bytes);
+        public int Compare(Key a, Key b)
+        {
+            var ab = a.Bytes;
+            var bb = b.Bytes;
+            for (var i = 0; i < ab.Length; i++)
+            {
+                if (ab[i] > bb[i])
+                    return 1;
+                if (ab[i] < bb[i])
+                    return -1;
+            }
+
+            return 0;
+        }
+
         public BigInteger Distance(Key a, Key b) => ToBigInt(XOR(a.Bytes, b.Bytes));
 
         public static BigInteger ToBigInt(byte[] bytes)

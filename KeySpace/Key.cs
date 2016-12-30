@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KeySpace
 {
-    public class Key : IEquatable<Key>
+    public class Key : IEquatable<Key>, IComparable<Key>
     {
         public IKeySpace Space { get; }
         public byte[] Original { get; }
@@ -19,8 +16,9 @@ namespace KeySpace
             Bytes = bytes;
         }
 
-        public override string ToString() => $"<Key {Convert.ToBase64String(Bytes)}>";
-        public bool Equals(Key other) => ReferenceEquals(Space, other.Space) && Space.Equal(this, other);
+        public int CompareTo(Key other) => Space.Compare(this, other);
+        public override string ToString() => $"<Key {Convert.ToBase64String(Bytes, Base64FormattingOptions.None)}>";
+        public bool Equals(Key other) => ReferenceEquals(Space, other?.Space) && Space.Equal(this, other);
         public BigInteger Distance(Key other) => !ReferenceEquals(Space, other.Space) ? BigInteger.MinusOne : Space.Distance(this, other);
     }
 }
