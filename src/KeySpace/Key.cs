@@ -17,7 +17,7 @@ namespace KeySpace
         }
 
         public int CompareTo(Key other) => Space.Compare(this, other);
-        public override string ToString() => $"<Key {Convert.ToBase64String(Bytes, Base64FormattingOptions.None)}>";
+        public override string ToString() => $"<Key {Convert.ToBase64String(Bytes)}>";
         public bool Equals(Key other) => ReferenceEquals(Space, other?.Space) && Space.Equal(this, other);
         public BigInteger Distance(Key other) => !ReferenceEquals(Space, other.Space) ? BigInteger.MinusOne : Space.Distance(this, other);
     }
