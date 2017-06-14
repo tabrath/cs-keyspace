@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using NUnit.Framework;
+using Xunit;
 
 namespace KeySpace.Tests
 {
-    [TestFixture]
     public class XORTests
     {
-        [TestCase(new byte[] { 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00 }, 24)]
-        [TestCase(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, 56)]
-        [TestCase(new byte[] { 0x00, 0x58, 0xFF, 0x80, 0x00, 0x00, 0xF0 }, 9)]
+        [Theory]
+        [InlineData(new byte[] { 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00 }, 24)]
+        [InlineData(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, 56)]
+        [InlineData(new byte[] { 0x00, 0x58, 0xFF, 0x80, 0x00, 0x00, 0xF0 }, 9)]
         public void TestPrefixLength(byte[] c, int len)
         {
-            Assert.That(XORKeySpace.ZeroPrefixLength(c), Is.EqualTo(len));
+            Assert.Equal(XORKeySpace.ZeroPrefixLength(c), len);
         }
 
-        [Test]
+        [Fact]
         public void TestXorKeySpace()
         {
             var ids = new[]
@@ -36,21 +36,21 @@ namespace KeySpace.Tests
             var i = 0;
             foreach (var set in ks)
             {
-                Assert.That(set[0].Equals(set[1]));
-                Assert.That(set[0].Bytes, Is.EqualTo(set[1].Bytes));
-                Assert.That(set[0].Original, Is.EqualTo(ids[i]));
-                Assert.That(set[0].Bytes.Length, Is.EqualTo(32));
+                Assert.Equal(set[0], set[1]);
+                Assert.Equal(set[0].Bytes, set[1].Bytes);
+                Assert.Equal(set[0].Original, ids[i]);
+                Assert.Equal(set[0].Bytes.Length, 32);
                 i++;
             }
 
             for (i = 1; i < ks.Length; i++)
             {
-                Assert.That(ks[i][0].Distance(ks[i-1][0]).CompareTo(ks[i-1][0].Distance(ks[i][0])), Is.EqualTo(0));
-                Assert.That(ks[i][0].Equals(ks[i-1][0]), Is.False);
+                Assert.Equal(ks[i][0].Distance(ks[i-1][0]).CompareTo(ks[i-1][0].Distance(ks[i][0])), 0);
+                Assert.False(ks[i][0].Equals(ks[i-1][0]));
             }
         }
 
-        [Test]
+        [Fact]
         public void TestDistancesAndCenterSorting()
         {
             var adjs = new[]
@@ -66,22 +66,22 @@ namespace KeySpace.Tests
             var keys = adjs.Select(a => new Key(XORKeySpace.Instance, a)).ToArray();
             Func<long, BigInteger, int> cmp = (a, b) => new BigInteger(a).CompareTo(b);
 
-            Assert.That(cmp(0, keys[2].Distance(keys[3])), Is.EqualTo(0));
-            Assert.That(cmp(1, keys[2].Distance(keys[4])), Is.EqualTo(0));
+            Assert.Equal(cmp(0, keys[2].Distance(keys[3])), 0);
+            Assert.Equal(cmp(1, keys[2].Distance(keys[4])), 0);
 
             var d1 = keys[2].Distance(keys[5]);
             var d2 = XORKeySpace.XOR(keys[2].Bytes, keys[5].Bytes);
             d2 = d2.Skip(keys[2].Bytes.Length - d1.ToByteArray().Length).ToArray();
-            Assert.That(d1.ToByteArray().Reverse().ToArray(), Is.EqualTo(d2));
+            Assert.Equal(d1.ToByteArray().Reverse().ToArray(), d2);
 
-            Assert.That(cmp(2<<32, keys[2].Distance(keys[5])), Is.EqualTo(-1));
+            Assert.Equal(cmp(2<<32, keys[2].Distance(keys[5])), -1);
 
             var keys2 = keys.SortByDistance(keys[2]);
             var order = new[] {2,3,4,5,1,0};
             var i = 0;
             foreach (var o in order)
             {
-                Assert.That(keys[o].Bytes, Is.EqualTo(keys2[i++].Bytes));
+                Assert.Equal(keys[o].Bytes, keys2[i++].Bytes);
             }
         }
     }
